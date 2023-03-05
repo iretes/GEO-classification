@@ -4,6 +4,7 @@ import pandas as pd
 import argparse
 import math
 import os
+import json
 from time import time
 from enum import Enum
 from statistics import mean
@@ -551,6 +552,8 @@ else: # ---------- Cross validation on development set & hold out test ---------
 
     # Dict to store predictions, scores and true targets on test data
     predictions = {}
+    for clf_name in clfs:
+        predictions[clf_name] = {}
 
     # Dictionary to store results
     results = {}
@@ -589,6 +592,10 @@ else: # ---------- Cross validation on development set & hold out test ---------
         )
 
         if verbose: print("Best params %s" % best_param)
+
+        # Save best params on json file
+        with open(output_path + clf_name + "_params.json", "w") as outfile:
+            json.dump(best_param, outfile)
 
         # Save cv results on csv file
         df = pd.DataFrame.from_dict(cv_results)

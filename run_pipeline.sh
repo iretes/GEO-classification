@@ -33,7 +33,7 @@ mkdir './results/'
 mkdir './results/GSE13355/'
 mkdir './results/GSE14905/'
 mkdir './results/GSE13355-GSE14905/'
-mkdir './results/GSE13355(TR)-GSE14905(TS)/'
+mkdir './results/GSE13355-TR-GSE14905-TS/'
 
 # Compare classifiers on GSE13355
 python ./compare.py \
@@ -69,7 +69,7 @@ python ./compare.py \
 python ./compare.py \
 --dev-dataset './datasets/GSE13355_sub.pkl' \
 --test-dataset './datasets/GSE14905_sub.pkl' \
---output-path './results/GSE13355(TR)-GSE14905(TS)/' \
+--output-path './results/GSE13355-TR-GSE14905-TS/' \
 --best-score 'concat f1 weighted' \
 --n-splits 5 \
 --ext-n-splits 5 \
