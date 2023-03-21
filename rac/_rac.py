@@ -131,6 +131,13 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
             if self.weighted: 
                 self.weights_[i] = self.compute_weights(self.class_signatures_[i])
 
+        # Assign feature importance
+        self.feature_importances_ = np.zeros(self.n_features_in_)
+        class_idxs = range(len(self.classes_))
+        class_pairs = [(c1, c2) for c1 in class_idxs for c2 in class_idxs if c2 > c1]
+        for c1, c2 in class_pairs:
+            self.feature_importances_ += np.abs(self.class_signatures_[c1] - self.class_signatures_[c2])
+
         # Return the classifier
         return self
 
