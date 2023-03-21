@@ -10,6 +10,7 @@ from numpy.linalg import norm
 
 class RAClassifier(BaseEstimator, ClassifierMixin):
     """RA Classifier class.
+
     Parameters
     ----------
     r_method: {'min', 'max', 'average'}, default='min'
@@ -18,15 +19,16 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
         Parameter that specifies the method used to aggregate the rankings.
     metric : {'spearman', 'kendall'}, default='spearman'
         Parameter that specifies the metric used to compute the distance to the signatures.
-    weighted : Boolean or int, default=False
+    weighted : Boolean or list, default=False
         Parameter that specifies whether the distance to the signatures is weighted by the rank or not.
         Ignored if the parameter metric is 'kendall'.
         If True weights depends on to the rank: the weights for the candidates at top and bottom of the ranking
         are higher and decrease towards the center of the ranking.
-        If tuple it must have 2 int values (n1, n2). In that case only the n1 features at the top and 
+        If it is a list it must have 2 int values [n1, n2]. In that case only the n1 features at the top and 
         n2 features at the bottom of the ranking will be taken into account.
     p : float
         Parameter that specifies the exponent to use in the weighting function when weighted is True and metric is 'kendall'.
+
     Attributes
     ----------
     X_ : ndarray, shape (n_samples, n_features)
@@ -62,12 +64,14 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
         """Computes class signatures and centroids.
         To compute class signatures the features are ranked for each training sample
         and a Borda based rank aggregation method is applied to all samples from each class.
+
         Parameters
         ----------
         X : array-like, shape (n_samples, n_features)
             The training input samples.
         y : array-like, shape (n_samples,)
             The target values. An array of int.
+
         Returns
         -------
         self : object
@@ -99,14 +103,20 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
         if self.metric in ['kendall']:
             self.weighted = False
         else:
-            if isinstance(self.weighted, tuple):
-                if (not isinstance(self.weighted[0], int) or not isinstance(self.weighted[1], int)):
+            if isinstance(self.weighted, list):
+                if (isinstance(self.weighted[0], float) and isinstance(self.weighted[1], float)):
+                    self.n_features_top = self.weighted[0]*X.shape[1]
+                    self.n_features_bottom = self.weighted[1]*X.shape[1]
+                elif (isinstance(self.weighted[0], int) and isinstance(self.weighted[1], int)):
+                    self.n_features_top = self.weighted[0]
+                    self.n_features_bottom = self.weighted[1]
+                else:
                     raise TypeError("Invalid weighted (values must be int).")
-                if (self.weighted[0] < 0 or self.weighted[1] < 0):
+                if (self.n_features_top < 0 or self.n_features_bottom < 0):
                     raise ValueError("Invalid weighted (values must be >= 0).")
-                if (self.weighted[0]+self.weighted[1] >= self.n_features_in_):
+                if (self.n_features_top + self.n_features_bottom >= self.n_features_in_):
                     raise ValueError("Invalid weighted (the sum of the values must be less than the number of features).")
-                if (self.weighted[0]+self.weighted[1] == 0):
+                if (self.n_features_top + self.n_features_bottom == 0):
                     raise ValueError("Invalid weighted (cannot set all weights to 0).")
             elif not isinstance(self.weighted, bool):
                 raise TypeError("Invalid weighted (must be bool or tuple).")
@@ -134,6 +144,7 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
         ----------
         X : array-like, shape (n_samples, n_features)
             The test samples.
+
         Returns
         -------
         y : ndarray, shape (n_samples,)
@@ -159,6 +170,7 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
 
     def predict_proba(self, X):
         """Return probability estimates for the test data X.
+        
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
@@ -202,10 +214,12 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
 
     def distances_to_signatures(self, X):
         """Computes the matrix of pairwise distances between the ranking of features in the two sample sets.
+
         Parameters
         ----------
         X : array-like, shape (n_samples, n_features)
             Input samples to compare to signatures.
+
         Returns
         -------
         d : array-like, shape (n_samples, n_classes)
@@ -228,10 +242,12 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
 
     def aggregate(self, X):
         """Ranks features and aggregates them into one signature.
+
         Parameters
         ----------
         X : array-like, shape (n_samples, n_features)
             The input samples from one class only.
+
         Returns
         -------
         a : ndarray, shape (n_features,)
@@ -269,6 +285,7 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
 
     def compute_weights(self, signature):
         """Computes the weights associated with a class signature.
+
         Parameters
         ----------
         signature : array-like of shape (n_features)
@@ -281,14 +298,15 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
         """
         max_rank = np.max(signature)
         if isinstance(self.weighted, tuple):
-            return ((signature <= self.weighted[0]) | \
-                    (signature > max_rank-self.weighted[1])).astype(int)
+            return ((signature <= self.n_features_top) | \
+                    (signature > max_rank-self.n_features_bottom)).astype(int)
         else:
             return np.power(np.abs(max_rank+1-2*signature), self.p)
 
     def convert_distances_to_probas(self, d):
         """Converts distances into probabilities estimates.
            Lower distances correspond to higher probabilities.
+
            Parameters
            ----------
            d : array-like, shape (n_classes)
