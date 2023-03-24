@@ -167,7 +167,7 @@ plt.figure()
 A = set(rac_feature_rank[:N_TOP_FEATURES])
 B = set(rf_feature_rank[:N_TOP_FEATURES])
 C = set(svm_feature_rank[:N_TOP_FEATURES])
-diagram = venn3([A, B, C], ("RAC features", "SVM features", "RF features"))
+diagram = venn3([A, B, C], ("RAC features", "RF features", "SVM features"))
 
 A=set(map(str,A))
 B=set(map(str,B))
