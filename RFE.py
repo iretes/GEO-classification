@@ -55,7 +55,7 @@ parser.add_argument(
     action='store',
     type=str,
     required=True,
-    help="Path to the .json file with SVM parameters (kernel must be 'poly')."
+    help="Path to the .json file with SVM parameters (kernel must be 'linear')."
 )
 parser.add_argument(
     '--rf-params',

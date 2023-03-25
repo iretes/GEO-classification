@@ -122,7 +122,7 @@ python RFE.py [-h] --dataset DATASET --rac-params RAC_PARAMS --svm-params SVM_PA
 | -h, --help | ✔️ | Show the help message and exit. |
 | --dataset DATASET | | Path to the dataset. |
 | --rac-params RAC-PARAMS | | Path to the .json file with RAC parameters. |
-| --svm-params SVM-PARAMS | | Path to the .json file with SVM parameters (kernel must be 'poly'). |
+| --svm-params SVM-PARAMS | | Path to the .json file with SVM parameters (kernel must be 'linear'). |
 | --rf-params RF-PARAMS | | Path to the .json file with RF parameters. | 
 | --pos-lbl POS-LBL | ✔️ | Label of the 'positive' class in binary classification. |
 | --output-path OUTPUT-PATH | | Path where to save results. |
@@ -146,7 +146,7 @@ python eval_feature_importance.py [-h] --dataset DATASET --rac-params RAC_PARAMS
 | -h, --help | ✔️ | Show the help message and exit. |
 | --dataset DATASET | | Path to the dataset. |
 | --rac-params RAC-PARAMS | | Path to the .json file with RAC parameters. |
-| --svm-params SVM-PARAMS | | Path to the .json file with SVM parameters (kernel must be 'poly'). |
+| --svm-params SVM-PARAMS | | Path to the .json file with SVM parameters (kernel must be 'linear'). |
 | --rf-params RF-PARAMS | | Path to the .json file with RF parameters. | 
 | --n-features | ✔️ | Number of features to plot (default: 20). |
 | --output-path OUTPUT-PATH | | Path where to save results. |

@@ -31,7 +31,7 @@ parser.add_argument(
     action='store',
     type=str,
     required=True,
-    help="Path to the .json file with SVM parameters (kernel must be 'poly')."
+    help="Path to the .json file with SVM parameters (kernel must be 'linear')."
 )
 parser.add_argument(
     '--rf-params',
@@ -68,7 +68,7 @@ rac_params_path = args.rac_params
 svm_params_path = args.svm_params
 rf_params_path = args.rf_params
 n_features = args.n_features
-path = args.path
+path = args.output_path
 name = args.name
 
 with open(dataset, 'rb') as fp :

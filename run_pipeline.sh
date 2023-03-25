@@ -77,11 +77,14 @@ python ./compare.py \
 --ext-n-splits 5 \
 --verbose
 
+# SVM default parameters with linear kernel
+echo '{"kernel" : "linear"}' > './results/GSE13355/SVM_params.json'
+
 # Apply Recursive Feature Elimination on GSE13355
-python ./RFE.csv \
+python ./RFE.py \
 --dataset './datasets/GSE13355.pkl' \
 --rac-params './results/GSE13355-TR-GSE14905-TS/RAC_params.json' \
---svm-params './results/GSE13355-TR-GSE14905-TS/SVM_params.json' \
+--svm-params './results/GSE13355/SVM_params.json' \
 --rf-params './results/GSE13355-TR-GSE14905-TS/RF_params.json' \
 --output-path './results/GSE13355/feature_elimination/' \
 --n-splits 5 \
@@ -93,7 +96,7 @@ python ./RFE.csv \
 python ./eval_feature_importance.py \
 --dataset './datasets/GSE13355.pkl' \
 --rac-params './results/GSE13355-TR-GSE14905-TS/RAC_params.json' \
---svm-params './results/GSE13355-TR-GSE14905-TS/SVM_params.json' \
+--svm-params './results/GSE13355/SVM_params.json' \
 --rf-params './results/GSE13355-TR-GSE14905-TS/RF_params.json' \
 --output-path './results/GSE13355/feature_importance/' \
 --name 'GSE13355'
