@@ -34,13 +34,6 @@ scores = {
     'f1 weighted': Scorer(f1_score, average='weighted')
 }
 
-best_scores_available = []
-for score_name in scores:
-    best_scores_available.append(score_name)
-    best_scores_available.append('mean '+score_name)
-    best_scores_available.append('concat '+score_name)
-best_scores_available.append('aggregated rank')
-
 # -------------------------- Cmd line argument parsing -------------------------
 parser = argparse.ArgumentParser(description='Recursive Feature Elimination')
 parser.add_argument(
@@ -62,7 +55,7 @@ parser.add_argument(
     action='store',
     type=str,
     required=True,
-    help="Path to the .json file with SVM parameters."
+    help="Path to the .json file with SVM parameters (kernel must be 'poly')."
 )
 parser.add_argument(
     '--rf-params',
@@ -110,23 +103,14 @@ parser.add_argument(
     action='store',
     type=int,
     default=20,
-    help="'n-features-to-select' parameter of RFE."
+    help="RFE parameter."
 )
 parser.add_argument(
     '--step',
     action='store',
     type=float,
     default=0.5,
-    help="'step' parameter of RFE."
-)
-parser.add_argument(
-    '--best-score',
-    action='store',
-    type=str,
-    default='concat f1 weighted',
-    help="Scorer function to use to determine the best parameters, "+
-    "must be in %s. If not specified all the scores will be evaluated." 
-    % best_scores_available
+    help="RFE parameter."
 )
 parser.add_argument(
     '--verbose',
@@ -147,7 +131,6 @@ random_state = args.random_state
 standardize = args.standardize
 n_features_to_select = args.n_features_to_select
 step = args.step
-best_score = args.best_score
 verbose = args.verbose
 
 # ------------------------- Cmd line argument validation -----------------------

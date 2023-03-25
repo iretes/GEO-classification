@@ -31,7 +31,7 @@ parser.add_argument(
     action='store',
     type=str,
     required=True,
-    help="Path to the .json file with SVM parameters."
+    help="Path to the .json file with SVM parameters (kernel must be 'poly')."
 )
 parser.add_argument(
     '--rf-params',
@@ -41,7 +41,14 @@ parser.add_argument(
     help="Path to the .json file with RF parameters."
 )
 parser.add_argument(
-    '--path',
+    '--n-features',
+    action='store',
+    type=int,
+    default=20,
+    help="Number of features to plot."
+)
+parser.add_argument(
+    '--output-path',
     action='store',
     type=str,
     required=True,
@@ -60,6 +67,7 @@ dataset = args.dataset
 rac_params_path = args.rac_params
 svm_params_path = args.svm_params
 rf_params_path = args.rf_params
+n_features = args.n_features
 path = args.path
 name = args.name
 
@@ -91,36 +99,34 @@ rf.fit(X, y)
 
 # FEATURE IMPORTANCE HISTOGRAM
 
-N_TOP_FEATURES = 20
-
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 7))
 
 rac_idx = np.flip(np.argsort(rac.feature_importances_))
 rac_feature_rank = [feature_ids[i] for i in rac_idx]
-ax1.bar(range(N_TOP_FEATURES), rac.feature_importances_[rac_idx[:N_TOP_FEATURES]]/X.shape[1], align='center')
+ax1.bar(range(n_features), rac.feature_importances_[rac_idx[:n_features]]/X.shape[1], align='center')
 ax1.set_title('RAC')
 ax1.set_ylabel('Feature importance')
 ax1.set_axisbelow(True)
 ax1.grid(axis='y')
-ax1.set_xticks(range(N_TOP_FEATURES), rac_feature_rank[:N_TOP_FEATURES], rotation = 90)
+ax1.set_xticks(range(n_features), rac_feature_rank[:n_features], rotation = 90)
 
 svm_idx = np.flip(np.argsort(svm.coef_[0]))
 svm_feature_rank = [feature_ids[i] for i in svm_idx]
-ax2.bar(range(N_TOP_FEATURES), svm.coef_[0][svm_idx[:N_TOP_FEATURES]], align='center')
+ax2.bar(range(n_features), svm.coef_[0][svm_idx[:n_features]], align='center')
 ax2.set_title('SVM')
 ax2.set_ylabel('Feature importance')
 ax2.set_axisbelow(True)
 ax2.grid(axis='y')
-ax2.set_xticks(range(N_TOP_FEATURES), svm_feature_rank[:N_TOP_FEATURES], rotation = 90)
+ax2.set_xticks(range(n_features), svm_feature_rank[:n_features], rotation = 90)
 
 rf_idx = np.flip(np.argsort(rf.feature_importances_))
 rf_feature_rank = [feature_ids[i] for i in rf_idx]
-ax3.bar(range(N_TOP_FEATURES), rf.feature_importances_[rf_idx[:N_TOP_FEATURES]], align='center')
+ax3.bar(range(n_features), rf.feature_importances_[rf_idx[:n_features]], align='center')
 ax3.set_title('RF')
 ax3.set_ylabel('Feature importance')
 ax3.set_axisbelow(True)
 ax3.grid(axis='y')
-ax3.set_xticks(range(N_TOP_FEATURES), rf_feature_rank[:N_TOP_FEATURES], rotation = 90)
+ax3.set_xticks(range(n_features), rf_feature_rank[:n_features], rotation = 90)
 
 fig.subplots_adjust(top=0.88)
 fig.suptitle(name)
@@ -164,9 +170,9 @@ df.to_csv(path+'rank.csv')
 # VENN DIAGRAM
 
 plt.figure()
-A = set(rac_feature_rank[:N_TOP_FEATURES])
-B = set(rf_feature_rank[:N_TOP_FEATURES])
-C = set(svm_feature_rank[:N_TOP_FEATURES])
+A = set(rac_feature_rank[:n_features])
+B = set(rf_feature_rank[:n_features])
+C = set(svm_feature_rank[:n_features])
 diagram = venn3([A, B, C], ("RAC features", "RF features", "SVM features"))
 
 A=set(map(str,A))

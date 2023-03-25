@@ -108,5 +108,49 @@ python compare.py [-h] [--nested-cv | --no-nested-cv] --dev-dataset DEV-DATASET
 | --standardize, --no-standardize | ✔️ | Whether to standardize features (default: False). |
 | --verbose, --no-verbose | ✔️ | Whether to print verbose output (default: False). |
 
+Run the script `RFE.py` to apply [Recursive Feature Elimination](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFE.html) and compare the performances of the classifiers over the dataset with the selected features. The performances and the selected feature will be saved in `.csv` files. Predictions made by classifiers will be serialized in the file `predictions.pkl`, to access them see the script `read_predictions.py`.
+```
+python RFE.py [-h] --dataset DATASET --rac-params RAC_PARAMS --svm-params SVM_PARAMS
+                    --rf-params RF_PARAMS [--pos-lbl POS_LBL] --output-path OUTPUT_PATH
+                    [--n-splits N_SPLITS] [--random-state RANDOM_STATE]
+                    [--standardize | --no-standardize] 
+                    [--n-features-to-select N_FEATURES_TO_SELECT]
+                    [--step STEP] [--best-score BEST_SCORE] [--verbose | --no-verbose]
+```
+| Argument | Optional | Description    |
+| -------- | -------- | -------------- |
+| -h, --help | ✔️ | Show the help message and exit. |
+| --dataset DATASET | | Path to the dataset. |
+| --rac-params RAC-PARAMS | | Path to the .json file with RAC parameters. |
+| --svm-params SVM-PARAMS | | Path to the .json file with SVM parameters (kernel must be 'poly'). |
+| --rf-params RF-PARAMS | | Path to the .json file with RF parameters. | 
+| --pos-lbl POS-LBL | ✔️ | Label of the 'positive' class in binary classification. |
+| --output-path OUTPUT-PATH | | Path where to save results. |
+| --n-splits N-SPLITS | ✔️ | Number of folds to use in the cross validation (default: 5). |
+| --random-state RANDOM-STATE | ✔️ | Seed to get reproducible results. |
+| --standardize, --no-standardize | ✔️ | Whether to standardize features (default: False). |
+| --n-features-to-select | ✔️ | RFE parameter (default: 20).|
+| --step | ✔️ | RFE parameter (default: 0.5). |
+| --verbose, --no-verbose | ✔️ | Whether to print verbose output (default: False). |
+
+Run the script `eval_feature_importance.py` to get the rankings of the features according to their importance.
+Rankings will be saved into `.csv` files. An histogram will show the top features with their score and a Venn diagram
+will show the intersections between the sets of features.
+```
+python eval_feature_importance.py [-h] --dataset DATASET --rac-params RAC_PARAMS
+                            --svm-params SVM_PARAMS --rf-params RF_PARAMS
+                            --output-path OUTPUT_PATH --name NAME
+```
+| Argument | Optional | Description    |
+| -------- | -------- | -------------- |
+| -h, --help | ✔️ | Show the help message and exit. |
+| --dataset DATASET | | Path to the dataset. |
+| --rac-params RAC-PARAMS | | Path to the .json file with RAC parameters. |
+| --svm-params SVM-PARAMS | | Path to the .json file with SVM parameters (kernel must be 'poly'). |
+| --rf-params RF-PARAMS | | Path to the .json file with RF parameters. | 
+| --n-features | ✔️ | Number of features to plot (default: 20). |
+| --output-path OUTPUT-PATH | | Path where to save results. |
+| --name NAME | | The name of the dataset (plot title). |
+
 ## Usage example
 See file `run_pipeline.sh`.

@@ -34,6 +34,8 @@ mkdir './results/GSE13355/'
 mkdir './results/GSE14905/'
 mkdir './results/GSE13355-GSE14905/'
 mkdir './results/GSE13355-TR-GSE14905-TS/'
+mkdir './results/GSE13355/feature_importance/'
+mkdir './results/GSE13355/feature_elimination/'
 
 # Compare classifiers on GSE13355
 python ./compare.py \
@@ -74,3 +76,24 @@ python ./compare.py \
 --n-splits 5 \
 --ext-n-splits 5 \
 --verbose
+
+# Apply Recursive Feature Elimination on GSE13355
+python ./RFE.csv \
+--dataset './datasets/GSE13355.pkl' \
+--rac-params './results/GSE13355-TR-GSE14905-TS/RAC_params.json' \
+--svm-params './results/GSE13355-TR-GSE14905-TS/SVM_params.json' \
+--rf-params './results/GSE13355-TR-GSE14905-TS/RF_params.json' \
+--output-path './results/GSE13355/feature_elimination/' \
+--n-splits 5 \
+--n-features-to-select 20 \
+--step 0.5 \
+--verbose
+
+# Evaluate feature importance on GSE13355
+python ./eval_feature_importance.py \
+--dataset './datasets/GSE13355.pkl' \
+--rac-params './results/GSE13355-TR-GSE14905-TS/RAC_params.json' \
+--svm-params './results/GSE13355-TR-GSE14905-TS/SVM_params.json' \
+--rf-params './results/GSE13355-TR-GSE14905-TS/RF_params.json' \
+--output-path './results/GSE13355/feature_importance/' \
+--name 'GSE13355'
