@@ -660,7 +660,7 @@ else: # ---------- Cross validation on development set & hold out test ---------
 
     # Save test results on csv file
     df = pd.DataFrame.from_dict(results, orient='index', columns=clfs.keys())
-    df.to_csv(output_path+'cv.csv')
+    df.to_csv(output_path+'test_scores.csv')
 
     # Save predictions, true targets and scores
     with open(output_path + "predictions.pkl", "wb") as fp:
