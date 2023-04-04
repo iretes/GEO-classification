@@ -27,7 +27,7 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
         If it is a list it must have 2 int values [n1, n2]. In that case only the n1 features at the top and 
         n2 features at the bottom of the ranking will be taken into account.
     p : float
-        Parameter that specifies the exponent to use in the weighting function when weighted is True and metric is 'kendall'.
+        Parameter that specifies the exponent to use in the weighting function when weighted is True and metric is 'spearman'.
 
     Attributes
     ----------
@@ -119,7 +119,7 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
                 if (self.n_features_top + self.n_features_bottom == 0):
                     raise ValueError("Invalid weighted (cannot set all weights to 0).")
             elif not isinstance(self.weighted, bool):
-                raise TypeError("Invalid weighted (must be bool or tuple).")
+                raise TypeError("Invalid weighted (must be bool or list).")
 
         # Compute signature, centroid and weights for each class
         self.class_signatures_ = np.empty((len(self.classes_), self.n_features_in_))
@@ -304,7 +304,7 @@ class RAClassifier(BaseEstimator, ClassifierMixin):
             computed according to the weighting mode required.
         """
         max_rank = np.max(signature)
-        if isinstance(self.weighted, tuple):
+        if isinstance(self.weighted, list):
             return ((signature <= self.n_features_top) | \
                     (signature > max_rank-self.n_features_bottom)).astype(int)
         else:
