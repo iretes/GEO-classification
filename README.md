@@ -51,7 +51,7 @@ python integrate.py [-h] --pkl-in PKL-IN [PKL-IN ...] --pkl-out PKL-OUT [PKL-OUT
 ### Step 2
 Run the script `compare.py` to compare the performances of ML classifiers on preprocessed datasets.
 You can choose to compare the following classifiers: [Nearest Centroid](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestCentroid.html) (NC), [K-Nearest Neighbors](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (KNN),
-[Support Vector Machine](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (SVM), [Gaussian Naive Bayes](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html) (GNB), [Random Forest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (RF), [Extreme Gradient Boosting](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwirouKg7tP-AhUSRfEDHaUdDnkQFnoECAwQAQ&url=https%3A%2F%2Fxgboost.readthedocs.io%2F&usg=AOvVaw1Rb2paRgUY_gHcA0BusqY4), [Rank Aggregation Classifier](https://github.com/iretes/RAC) (RAC).
+[Support Vector Machine](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (SVM), [Gaussian Naive Bayes](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html) (GNB), [Random Forest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (RF), [Extreme Gradient Boosting](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwirouKg7tP-AhUSRfEDHaUdDnkQFnoECAwQAQ&url=https%3A%2F%2Fxgboost.readthedocs.io%2F&usg=AOvVaw1Rb2paRgUY_gHcA0BusqY4) (XGB), [Rank Aggregation Classifier](https://github.com/iretes/RAC) (RAC).
 
 The table below shows the hyperparameters that will be explored.
 | Classifier | Hyperparameter    | Values                                                 |
@@ -113,7 +113,8 @@ python compare.py [-h] [--nested-cv | --no-nested-cv] --dev-dataset DEV-DATASET
 Run the script `RFE.py` to apply [Recursive Feature Elimination](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFE.html) and compare the performances of the classifiers over the dataset with the selected features. The performances and the selected feature will be saved in `.csv` files. Predictions made by classifiers will be serialized in the file `predictions.pkl`, to access them see the script `read_predictions.py`.
 ```
 python RFE.py [-h] --dataset DATASET --rac-params RAC_PARAMS --svm-params SVM_PARAMS
-                    --rf-params RF_PARAMS [--pos-lbl POS_LBL] --output-path OUTPUT_PATH
+                    --rf-params RF_PARAMS --xgb-params XGB_PARAMS 
+                    [--pos-lbl POS_LBL] --output-path OUTPUT_PATH
                     [--n-splits N_SPLITS] [--random-state RANDOM_STATE]
                     [--standardize | --no-standardize] 
                     [--n-features-to-select N_FEATURES_TO_SELECT]
@@ -126,6 +127,7 @@ python RFE.py [-h] --dataset DATASET --rac-params RAC_PARAMS --svm-params SVM_PA
 | --rac-params RAC-PARAMS | | Path to the .json file with RAC parameters. |
 | --svm-params SVM-PARAMS | | Path to the .json file with SVM parameters (kernel must be 'linear'). |
 | --rf-params RF-PARAMS | | Path to the .json file with RF parameters. | 
+| --xgb-param XGB-PARAMS | | Path to the .json file with XGB parameters. |
 | --pos-lbl POS-LBL | ✔️ | Label of the 'positive' class in binary classification. |
 | --output-path OUTPUT-PATH | | Path where to save results. |
 | --n-splits N-SPLITS | ✔️ | Number of folds to use in the cross validation (default: 5). |
