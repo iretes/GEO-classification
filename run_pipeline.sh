@@ -86,17 +86,9 @@ python ./RFE.py \
 --rac-params './results/GSE13355-TR-GSE14905-TS/RAC_params.json' \
 --svm-params './results/GSE13355/SVM_params.json' \
 --rf-params './results/GSE13355-TR-GSE14905-TS/RF_params.json' \
+--xgb-params './results/GSE13355-TR-GSE14905-TS/XGB_params.json' \
 --output-path './results/GSE13355/feature_elimination/' \
 --n-splits 5 \
 --n-features-to-select 20 \
 --step 0.5 \
 --verbose
-
-# Evaluate feature importance on GSE13355
-python ./eval_feature_importance.py \
---dataset './datasets/GSE13355.pkl' \
---rac-params './results/GSE13355-TR-GSE14905-TS/RAC_params.json' \
---svm-params './results/GSE13355/SVM_params.json' \
---rf-params './results/GSE13355-TR-GSE14905-TS/RF_params.json' \
---output-path './results/GSE13355/feature_importance/' \
---name 'GSE13355'

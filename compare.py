@@ -18,6 +18,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
 from sklearn.utils.multiclass import unique_labels
 from sklearn.metrics import auc
 from utils import Scorer
@@ -31,6 +32,7 @@ class Clfs(Enum):
     SVM = 'SVC'
     GNB = 'GNB'
     RF = 'RF'
+    XGB = 'XGB'
 
 classifiers_available = [name for name in Clfs.__members__]
 
@@ -223,6 +225,8 @@ for clf in classifiers:
         clfs[Clfs.GNB.name] = GaussianNB
     elif clf==Clfs.RF.name:
         clfs[Clfs.RF.name] = RandomForestClassifier
+    elif clf==Clfs.XGB.name:
+        clfs[Clfs.XGB.name] = XGBClassifier
     else:
         raise ValueError(
             "Invalid classifier (must be in %s)." % classifiers_available
@@ -248,7 +252,6 @@ if standardize:
 # ---------------------------- Parameter grids ---------------------------------
 
 n_features = X.shape[1]
-third = math.floor(1/3*n_features)
 RAC_grid = ParameterGrid([
     {
         'ra_method': ['borda', 'borda_median', 'borda_gmean', 'borda_l2'],
@@ -258,7 +261,7 @@ RAC_grid = ParameterGrid([
     },
     {
         'ra_method': ['borda', 'borda_median', 'borda_gmean', 'borda_l2'],
-        'weighted': [False, (third, third)],
+        'weighted': [False, [1/3, 1/3]],
         'r_method': ['min', 'max', 'average'],
     },
     {
@@ -324,13 +327,19 @@ RF_grid = ParameterGrid({
     'min_samples_split': [2, 0.1, 0.25, 0.33],
 })
 
+XGB_grid = ParameterGrid({
+    "n_estimators":[50, 100, 200],
+    "eta": [0.001, 0.01, 0.1, 0.3]
+})
+
 grids = {
     Clfs.RAC.name: RAC_grid,
     Clfs.NC.name: NC_grid,
     Clfs.KNN.name: KNN_grid,
     Clfs.SVM.name: SVC_grid,
     Clfs.GNB.name: GNB_grid,
-    Clfs.RF.name: RF_grid
+    Clfs.RF.name: RF_grid,
+    Clfs.XGB.name: XGB_grid
 }
 
 # ----------------------------  Nested cross validation ------------------------

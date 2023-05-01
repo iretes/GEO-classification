@@ -25,6 +25,7 @@ class Clfs(Enum):
     RAC = 'RAC'
     SVM = 'SVM'
     RF = 'RF'
+    XGB = 'XGB'
 
 # ----------------------------- Scores evaluated -------------------------------
 scores = {
@@ -63,6 +64,13 @@ parser.add_argument(
     type=str,
     required=True,
     help="Path to the .json file with RF parameters."
+)
+parser.add_argument(
+    '--xgb-params',
+    action='store',
+    type=str,
+    required=True,
+    help="Path to the .json file with XGB parameters."
 )
 parser.add_argument(
     '--pos-lbl',
@@ -124,6 +132,7 @@ dataset = args.dataset
 rac_params_path = args.rac_params
 svm_params_path = args.svm_params
 rf_params_path = args.rf_params
+xgb_params_path = args.xgb_params
 pos_lbl = args.pos_lbl
 output_path = args.output_path
 n_splits = args.n_splits
@@ -163,18 +172,24 @@ with open(svm_params_path) as svm_params_fp:
 with open(rf_params_path) as rf_params_fp:
     rf_params = json.load(rf_params_fp)
 
+with open(xgb_params_path) as xgb_params_fp:
+    xgb_params = json.load(xgb_params_fp)
+
 # Dict to store classifiers parameters
 clfs_params = {}
 clfs_params['RAC']=[]
 clfs_params['SVM']=[]
 clfs_params['RF']=[]
+clfs_params['XGB']=[]
 for i in range(n_splits):
     clfs_params['RAC'].append(rac_params)
     clfs_params['SVM'].append(svm_params)
     clfs_params['RF'].append(rf_params)
+    clfs_params['XGB'].append(xgb_params)
 print(clfs_params['RAC'])
 print(clfs_params['RF'])
 print(clfs_params['SVM'])
+print(clfs_params['XGB'])
 
 if not os.path.isdir(output_path):
     raise ValueError(
@@ -188,6 +203,7 @@ clfs_classes = {}
 clfs_classes[Clfs.RAC.name] = RAClassifier
 clfs_classes[Clfs.SVM.name] = SVC
 clfs_classes[Clfs.RF.name] = RandomForestClassifier
+clfs_classes[Clfs.XGB.name] = XGBClassifier
 
 if n_splits < 2:
     raise ValueError("Invalid nsplits (must be an int >= 2).")

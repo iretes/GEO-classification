@@ -36,7 +36,7 @@ python preprocess.py [-h] --txt-path TXT-PATH [--csv-path CSV-PATH]
 | --log-transform, --no-log-transform | ✔️ | Whether to apply a logarithimc transformation (default: False). |
 | --std-samples, --no-std-samples | ✔️ | Whether to standardize samples (default: False). |
 ### Step 1.2 (optional)
-Run the script `integrate.py` to merge preprocessed datasets into a single one or to delete from them features that are not shared by all.
+Run the script `integrate.py` to merge preprocessed datasets coming from experiments made with the same platform into a single one or to delete from them features that are not shared by all.
 ```
 python integrate.py [-h] --pkl-in PKL-IN [PKL-IN ...] --pkl-out PKL-OUT [PKL-OUT ...]
                     [--csv-out CSV-OUT [CSV-OUT ...]]
@@ -51,7 +51,7 @@ python integrate.py [-h] --pkl-in PKL-IN [PKL-IN ...] --pkl-out PKL-OUT [PKL-OUT
 ### Step 2
 Run the script `compare.py` to compare the performances of ML classifiers on preprocessed datasets.
 You can choose to compare the following classifiers: [Nearest Centroid](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestCentroid.html) (NC), [K-Nearest Neighbors](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (KNN),
-[Support Vector Machine](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (SVM), [Gaussian Naive Bayes](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html) (GNB), [Random Forest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (RF), [Rank Aggregation Classifier](https://github.com/iretes/RAC) (RAC).
+[Support Vector Machine](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (SVM), [Gaussian Naive Bayes](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html) (GNB), [Random Forest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (RF), [Extreme Gradient Boosting](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwirouKg7tP-AhUSRfEDHaUdDnkQFnoECAwQAQ&url=https%3A%2F%2Fxgboost.readthedocs.io%2F&usg=AOvVaw1Rb2paRgUY_gHcA0BusqY4), [Rank Aggregation Classifier](https://github.com/iretes/RAC) (RAC).
 
 The table below shows the hyperparameters that will be explored.
 | Classifier | Hyperparameter    | Values                                                 |
@@ -71,6 +71,8 @@ The table below shows the hyperparameters that will be explored.
 | 🟪 RAC     | `metric`            | `'spearman', 'kendall'`                              |
 | 🟪 RAC     | `weighted`          | `True, False, (1/3*n_feature, 1/3*n_feature)`        |
 | 🟪 RAC     | `p`                 | `1, 2, 3/4`                                          |
+| ⬛ XGB     | `n_estimators`      | `50, 100, 200`                                       |
+| ⬛ XGB     | `eta`               | `0.01, 0.1, 0.2, 0.3`                                |
 
 <sup>1</sup> max_neighbors is equal to the dimension of the training fold divided by the number of classes if such quantity is less than 20, otherwise it is equal to 20.
 
@@ -98,7 +100,7 @@ python compare.py [-h] [--nested-cv | --no-nested-cv] --dev-dataset DEV-DATASET
 | --test-dataset TEST-DATASET | ✔️ | Path to the test dataset. |
 | --pos-lbl POS-LBL | ✔️ | Label of the 'positive' class in binary classification. |
 | --output-path OUTPUT-PATH | | Path where to save results. |
-| --classifiers CLASSIFIERS [CLASSIFIERS ...] | ✔️ | Classifiers to compare, must be in ['RAC', 'NC', 'KNN', 'SVM', 'GNB', 'RF']. If not specified all the classifiers will be compared. |
+| --classifiers CLASSIFIERS [CLASSIFIERS ...] | ✔️ | Classifiers to compare, must be in ['RAC', 'NC', 'KNN', 'SVM', 'GNB', 'RF', 'XGB']. If not specified all the classifiers will be compared. |
 | --best-score BEST-SCORE | ✔️ | Scorer function to use to determine the best parameters, must be in ['accuracy', 'mean accuracy', 'concat accuracy', 'f1 micro', 'mean f1 micro', 'concat f1 micro', 'f1 macro', 'mean f1 macro', 'concat f1 macro', 'f1 weighted', 'mean f1 weighted', 'concat f1 weighted', 'aggregated rank']. If not specified all the scores will be evaluated.
 | --n-splits N-SPLITS | ✔️ | Number of folds to use; with --nested_cv refers to the number of internal folds; ignored with --loo (default: 5). |
 | --ext-n-splits EXT-N-SPLITS | ✔️ | Number of folds to use in the external cross validation; ignored with --ext-loo (default: 5). |
@@ -133,24 +135,7 @@ python RFE.py [-h] --dataset DATASET --rac-params RAC_PARAMS --svm-params SVM_PA
 | --step | ✔️ | RFE parameter (default: 0.5). |
 | --verbose, --no-verbose | ✔️ | Whether to print verbose output (default: False). |
 
-Run the script `eval_feature_importance.py` to get the rankings of the features according to their importance.
-Rankings will be saved into `.csv` files. An histogram will show the top features with their score and a Venn diagram
-will show the intersections between the sets of features.
-```
-python eval_feature_importance.py [-h] --dataset DATASET --rac-params RAC_PARAMS
-                            --svm-params SVM_PARAMS --rf-params RF_PARAMS
-                            --output-path OUTPUT_PATH --name NAME
-```
-| Argument | Optional | Description    |
-| -------- | -------- | -------------- |
-| -h, --help | ✔️ | Show the help message and exit. |
-| --dataset DATASET | | Path to the dataset. |
-| --rac-params RAC-PARAMS | | Path to the .json file with RAC parameters. |
-| --svm-params SVM-PARAMS | | Path to the .json file with SVM parameters (kernel must be 'linear'). |
-| --rf-params RF-PARAMS | | Path to the .json file with RF parameters. | 
-| --n-features | ✔️ | Number of features to plot (default: 20). |
-| --output-path OUTPUT-PATH | | Path where to save results. |
-| --name NAME | | The name of the dataset (plot title). |
+NOTE: The steps above refer to the integration of datasets coming from the same platform, if you want to integrate dataset coming from different platfomrs you first need to annotate the features using the R script `annotate.R`, then run the script `preprocess_annotated.py` before running the script `integrate.py`.
 
 ## Usage example
 See file `run_pipeline.sh`.
