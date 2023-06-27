@@ -17,6 +17,16 @@ python ./preprocess.py \
 --target-regexs '^.*psoriasis.*$' '^.*normal.*$' \
 --new-targets 'Psoriasis' 'Normal'
 
+# NOTE: if you want to integrate datasets from different platforms (not needed here), you have to:
+# 1) annotate the dataset
+Rscript annotate.R 'GSE13355' 'characteristics_ch1' './datasets/GSE13355annotated.csv'
+# 2) pre-process the annotated dataset
+python ./preprocess_annotated.py \
+--dataset 'GSE13355annotated.csv' \
+--target-regexs '^involved.*' '^.*controls.*$' \
+--new-targets 'Psoriasis' 'Normal' \
+--pkl-path './datasets/GSE13355.pkl'
+
 # --------------------------------- Step 1.2 -----------------------------------
 python ./integrate.py \
 --pkl-in './datasets/GSE13355.pkl' './datasets/GSE14905.pkl' \

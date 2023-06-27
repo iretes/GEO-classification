@@ -4,6 +4,7 @@ import argparse
 from collections import Counter
 from sklearn.preprocessing import StandardScaler
 import pickle as pkl
+import re
 
 parser = argparse.ArgumentParser(description='Preprocess annotated dataset')
 parser.add_argument(

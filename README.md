@@ -1,6 +1,7 @@
 # GEO Classification 🧬🤖
 Implementation of a pipeline to compare the performance of Machine Learning classifiers on Gene Expression Omnibus (GEO) data.
-## Quick start
+
+## Installation
 Install Python:
 
 `sudo apt install python3`
@@ -13,8 +14,10 @@ Install requirements:
 
 `python -m pip install --requirement requirements.txt`
 
+## Usage
+
 ### Step 1
-Run the script `preprocess.py` to read, preprocess and save data into a `.pkl` or `.csv` file from a GEO matrix series file.
+Run the script `preprocess.py` to read, preprocess and save data into `.pkl` and/or `.csv` files from a GEO matrix series file.
 ```
 python preprocess.py [-h] --txt-path TXT-PATH [--csv-path CSV-PATH] 
                         --pkl-path PKL-PATH --target-header TARGET-HEADER
@@ -76,7 +79,7 @@ The table below shows the hyperparameters that will be explored.
 
 <sup>1</sup> max_neighbors is equal to the dimension of the training fold divided by the number of classes if such quantity is less than 20, otherwise it is equal to 20.
 
-The performances of each classifiers will be evaluated by computing the following scores: [accuracy](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score), [f1 micro](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score), [f1 macro](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score), [f1 weighted](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score), [AUROC](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score), [AUROC weighted](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score).
+The performances of each classifier will be evaluated by computing the following scores: [accuracy](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score), [f1 micro](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score), [f1 macro](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score), [f1 weighted](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score), [AUROC](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score), [AUROC weighted](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score).
 Scores will be computed either averaging their values over the test folds, or on the concatenation of predictions made for each test fold.
 Results will be saved in `.csv` files.
 Predictions made by classifiers will be serialized in the file `predictions.pkl`, to access them
@@ -106,11 +109,33 @@ python compare.py [-h] [--nested-cv | --no-nested-cv] --dev-dataset DEV-DATASET
 | --ext-n-splits EXT-N-SPLITS | ✔️ | Number of folds to use in the external cross validation; ignored with --ext-loo (default: 5). |
 | --loo, --no-loo | ✔️ | Whether to perform leave one out cross validation; with --nested_cv leave one out cross validation will be done in the internal cross validation (default: False). |
 | --ext-loo, --no-ext-loo | ✔️ | Whether to perform leave one out cross validation in the external cross validation (default: False).
-| --random-state RANDOM-STATE | ✔️ | Seed to get reproducible results. |
+| --random-state RANDOM-STATE | ✔️ | Seed to get reproducible results (default: None). |
 | --standardize, --no-standardize | ✔️ | Whether to standardize features (default: False). |
 | --verbose, --no-verbose | ✔️ | Whether to print verbose output (default: False). |
 
-Run the script `RFE.py` to apply [Recursive Feature Elimination](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFE.html) and compare the performances of the classifiers over the dataset with the selected features. The performances and the selected feature will be saved in `.csv` files. Predictions made by classifiers will be serialized in the file `predictions.pkl`, to access them see the script `read_predictions.py`.
+**NOTE**: The steps above refer to the integration of datasets coming from the same platform, if you want to integrate dataset coming from different platfomrs you need to: 1) annotate the features using the R script `annotate.R` passing as arguments the GEO accesion code (in this case the dataset will be automatically downloaded), the target header and the path to the file to create; 2) run the script `preprocess_annotated.py`, whose arguments are described in the following; 3) run the script `integrate.py`.
+```
+python preprocess_annotated.py [-h] --dataset dataset [--csv-path CSV-PATH] 
+                        --pkl-path PKL-PATH
+                        --target-regexs TARGET-REGEXS [TARGET-REGEXS ...]
+                        --new-targets NEW-TARGETS [NEW-TARGETS ...]
+                        [--log-transform | --no-log-transform]
+                        [--std-samples | --no-std-samples]
+```
+| Argument | Optional | Description    |
+| -------- | -------- | -------------- |
+| -h, --help | ✔️ | Show the help message and exit. |
+| --dataset DATASET | | Path to the csv file with the annotated dataset. |
+| --csv-path CSV-PATH | ✔️ | Path to the `.csv` file to create. |
+| --pkl-path PKL-PATH | | Path to the `.pkl` file to create (a serialized dictionary with the following keys: 'X', 'y', 'features_ids', 'samples_ids'). |
+| --target-regexs TARGET-REGEXS [TARGET-REGEXS ...] | | Regular expression to select samples by their target.
+| --new-targets NEW-TARGETS [NEW-TARGETS ...] | | Targets to use instead. |
+| --log-transform, --no-log-transform | ✔️ | Whether to apply a logarithimc transformation (default: False). |
+| --std-samples, --no-std-samples | ✔️ | Whether to standardize samples (default: False). |
+
+### Recursive Feature Elimination
+
+Run the script `RFE.py` to apply [Recursive Feature Elimination](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFE.html) and compare the performances of the classifiers over the dataset with the selected features. The performances and the selected feature will be saved in `.csv` files. Predictions made by classifiers will be serialized in the file `predictions.pkl`, to access them see the script `read_predictions.py`. The ids of the selected features will be saved in csv files (one for each classifier).
 ```
 python RFE.py [-h] --dataset DATASET --rac-params RAC_PARAMS --svm-params SVM_PARAMS
                     --rf-params RF_PARAMS --xgb-params XGB_PARAMS 
@@ -127,17 +152,64 @@ python RFE.py [-h] --dataset DATASET --rac-params RAC_PARAMS --svm-params SVM_PA
 | --rac-params RAC-PARAMS | | Path to the .json file with RAC parameters. |
 | --svm-params SVM-PARAMS | | Path to the .json file with SVM parameters (kernel must be 'linear'). |
 | --rf-params RF-PARAMS | | Path to the .json file with RF parameters. | 
-| --xgb-param XGB-PARAMS | | Path to the .json file with XGB parameters. |
+| --xgb-params XGB-PARAMS | | Path to the .json file with XGB parameters. |
 | --pos-lbl POS-LBL | ✔️ | Label of the 'positive' class in binary classification. |
 | --output-path OUTPUT-PATH | | Path where to save results. |
 | --n-splits N-SPLITS | ✔️ | Number of folds to use in the cross validation (default: 5). |
-| --random-state RANDOM-STATE | ✔️ | Seed to get reproducible results. |
+| --random-state RANDOM-STATE | ✔️ | Seed to get reproducible results (default: None). |
 | --standardize, --no-standardize | ✔️ | Whether to standardize features (default: False). |
 | --n-features-to-select | ✔️ | RFE parameter (default: 20).|
 | --step | ✔️ | RFE parameter (default: 0.5). |
 | --verbose, --no-verbose | ✔️ | Whether to print verbose output (default: False). |
 
-NOTE: The steps above refer to the integration of datasets coming from the same platform, if you want to integrate dataset coming from different platfomrs you first need to annotate the features using the R script `annotate.R`, then run the script `preprocess_annotated.py` before running the script `integrate.py`.
+### Feature importances
 
-## Usage example
+Run the script `feature_importances.py` to save the features ranked by importance in csv files (one for each classifier).
+```
+python feature_importances.py [-h] --dataset DATASET 
+                    --rac-params RAC_PARAMS --svm-params SVM_PARAMS
+                    --rf-params RF_PARAMS --xgb-params XGB_PARAMS 
+                    --output-path OUTPUT_PATH
+```
+| Argument | Optional | Description    |
+| -------- | -------- | -------------- |
+| -h, --help | ✔️ | Show the help message and exit. |
+| --dataset DATASET | | Path to the dataset. |
+| --rac-params RAC-PARAMS | | Path to the .json file with RAC parameters. |
+| --svm-params SVM-PARAMS | | Path to the .json file with SVM parameters (kernel must be 'linear'). |
+| --rf-params RF-PARAMS | | Path to the .json file with RF parameters. | 
+| --xgb-params XGB-PARAMS | | Path to the .json file with XGB parameters. |
+| --output-path OUTPUT-PATH | | Path where to save results. |
+
+### Usage example
 See file `run_pipeline.sh`.
+
+## Results
+### Datasets
+**Table 1**: Datasets details
+<p align="left">
+    <img align="center" src='tables/datasets.png' width="550px">
+</p>
+
+### Performances
+**Table 2**: F1 and AUROC scores from nested cross validation on the concatenated datasets (’*’ for z-score normalized data)
+<p align="left">
+    <img align="center" src='tables/nested.png' width="550px">
+</p>
+
+**Table 3:** F1 and AUROC scores on test set, when training and testing on different datasets (’*’ for z-score normalized data)
+<p align="left">
+    <img align="center" src='tables/hold_out.png' width="550px">
+</p>
+
+**Table 4:** F1 score from a simple cross validation run (’*’ for z-score normalized data)
+<p align="left">
+    <img align="center" src='tables/f1_cv.png' width="550px">
+</p>
+
+**Table 5:** Known/Unknown genes in the litarature related to psoriasis among the genes with the highest 5 importance scores
+<p align="left">
+    <img align="center" src='tables/known_genes.png' width="550px">
+</p>
+
+The list of genes with the highest 5 importance values on PSO datasets, together with an evaluation of their relevance for the Psoriasis disease is reported in the file `psoriasis_genes.pdf` inside the folder `tables`.

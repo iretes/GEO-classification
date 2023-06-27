@@ -15,6 +15,7 @@ from sklearn.feature_selection import RFE
 from rac import RAClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
 from sklearn.utils.multiclass import unique_labels
 from sklearn.metrics import auc
 from utils import Scorer
