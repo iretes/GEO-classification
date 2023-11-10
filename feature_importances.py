@@ -99,7 +99,7 @@ xgb.fit(X, y)
 rac_idx = np.flip(np.argsort(rac.feature_importances_))
 rac_feature_rank = [feature_ids[i] for i in rac_idx]
 
-svm_idx = np.flip(np.argsort(svm.coef_[0]))
+svm_idx = np.flip(np.argsort(np.square(svm.coef_[0])))
 svm_feature_rank = [feature_ids[i] for i in svm_idx]
 
 rf_idx = np.flip(np.argsort(rf.feature_importances_))
